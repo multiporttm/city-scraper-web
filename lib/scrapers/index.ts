@@ -22,7 +22,7 @@ type Source = {
   source: EventSource;
   scrape: Scraper;
   nycOnly: boolean;
-  // Server env var the source needs (in .env.local); the source is skipped without it
+  // Worker secret the source needs (.dev.vars locally, wrangler secret put in production); skipped without it
   requiresEnv?: string;
   // Requests with the same key share one cached result
   cacheKey: (query: SourceQuery) => string;
@@ -44,7 +44,7 @@ const SOURCES: Source[] = [
 type CacheEntry = { at: number; events: Promise<EventItem[]> };
 
 // Keeps the promise, so requests that arrive while a scrape is running wait for it instead of scraping again.
-// Stored on globalThis because the dev server re-runs this module on every request, which would empty a plain Map.
+// Lives as long as the Worker isolate, so warm requests in the same location reuse it.
 const store = globalThis as typeof globalThis & { __eventsCache?: Map<string, CacheEntry> };
 const cache = (store.__eventsCache ??= new Map());
 

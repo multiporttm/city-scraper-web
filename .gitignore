@@ -62,3 +62,9 @@ example
 # generated native folders
 /ios
 /android
+
+# Cloudflare
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+public/build/

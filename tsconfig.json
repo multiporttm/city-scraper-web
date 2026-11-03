@@ -1,21 +1,16 @@
 {
-  "extends": "expo/tsconfig.base",
+  // Browser app (web/). The Worker has its own config in worker/tsconfig.json.
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "strict": true,
-    "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@/assets/*": [
-        "./assets/*"
-      ]
-    }
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "types": [],
+    "paths": { "@/*": ["./*"] }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "nativewind-env.d.ts"
-  ]
+  "include": ["web/**/*.ts", "types/**/*.d.ts"]
 }

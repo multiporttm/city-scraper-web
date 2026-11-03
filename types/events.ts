@@ -1,5 +1,3 @@
-import type { Ionicons } from '@expo/vector-icons';
-
 // The interest taxonomy from the quiz (INTEREST_OPTIONS in data/preferences.ts), plus 'Other' for events that match none
 export type EventCategory =
   | 'Music'
@@ -26,6 +24,30 @@ export type EventCategory =
 
 export type EventTone = 'green' | 'pink' | 'blue' | 'yellow';
 
+// Ionicons names (ionicons.com) for the category icons on map pins and image placeholders
+export type EventIcon =
+  | 'musical-notes-outline'
+  | 'restaurant-outline'
+  | 'leaf-outline'
+  | 'color-palette-outline'
+  | 'barbell-outline'
+  | 'happy-outline'
+  | 'book-outline'
+  | 'wine-outline'
+  | 'body-outline'
+  | 'camera-outline'
+  | 'film-outline'
+  | 'sparkles-outline'
+  | 'hardware-chip-outline'
+  | 'ticket-outline'
+  | 'flower-outline'
+  | 'game-controller-outline'
+  | 'walk-outline'
+  | 'shirt-outline'
+  | 'people-outline'
+  | 'trending-up-outline'
+  | 'calendar-outline';
+
 export type EventSource = 'luma' | 'ticketmaster' | 'eventbrite' | 'meetup' | 'seatgeek' | 'predicthq' | 'nycparks';
 
 export type EventItem = {
@@ -45,7 +67,7 @@ export type EventItem = {
   // 0 means free, null means the source didn't say
   price: number | null;
   tone: EventTone;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: EventIcon;
   imageUrl: string | null;
   host: string;
   externalUrl: string;

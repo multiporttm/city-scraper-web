@@ -1,0 +1,15 @@
+# Worker secrets for /api/events. Copy to .dev.vars for `npm run dev`,
+# and set each one in production with `npx wrangler secret put NAME`.
+# Each source is skipped until its key is set.
+
+# Free key: https://developer.ticketmaster.com (Discovery API)
+TICKETMASTER_API_KEY=
+
+# Free client id: https://seatgeek.com/account/develop
+SEATGEEK_CLIENT_ID=
+
+# Paid, with a free trial: https://control.predicthq.com (API access token)
+PREDICTHQ_TOKEN=
+
+# Optional, fills in Eventbrite ticket prices. Private token: https://www.eventbrite.com/platform/api-keys
+EVENTBRITE_TOKEN=

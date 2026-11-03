@@ -1,60 +1,22 @@
 {
   "name": "city-scraper",
-  "version": "1.0.0",
-  "main": "expo-router/entry",
-  "dependencies": {
-    "@expo/ui": "~58.0.23",
-    "@expo/vector-icons": "^15.0.2",
-    "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "~58.0.19",
-    "expo-constants": "~58.0.13",
-    "expo-device": "~58.0.5",
-    "expo-font": "~58.0.10",
-    "expo-glass-effect": "~58.0.5",
-    "expo-image": "~58.0.17",
-    "expo-linear-gradient": "~58.0.3",
-    "expo-linking": "~58.0.14",
-    "expo-router": "~58.0.26",
-    "expo-splash-screen": "~58.0.11",
-    "expo-status-bar": "~58.0.4",
-    "expo-symbols": "~58.0.4",
-    "expo-system-ui": "~58.0.6",
-    "expo-updates": "~58.0.18",
-    "expo-web-browser": "~58.0.6",
-    "nativewind": "5.0.0-rc.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "react-native": "0.88.0",
-    "react-native-css": "3.1.0-rc.0",
-    "react-native-gesture-handler": "~3.3.0",
-    "react-native-maps": "1.29.11",
-    "react-native-reanimated": "4.7.1",
-    "react-native-safe-area-context": "~5.10.1",
-    "react-native-screens": "~4.30.0",
-    "react-native-web": "~0.21.4",
-    "react-native-worklets": "0.13.0",
-    "zustand": "^5.0.16"
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p worker",
+    "cf-typegen": "wrangler types"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "4.1.12",
-    "@types/react": "~19.3.0",
-    "eslint": "^9.0.0",
-    "eslint-config-expo": "~58.0.4",
-    "lightningcss": "1.30.1",
-    "postcss": "8.5.31",
-    "tailwindcss": "4.1.12",
-    "typescript": "~6.0.3"
-  },
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "expo lint",
-    "update": "expo export -p ios -p android --no-bytecode --output-dir dist-update && npx eas-cli@latest update --skip-bundler --input-dir dist-update --branch production --environment production"
-  },
-  "private": true,
-  "overrides": {
-    "lightningcss": "1.30.1"
+    "@cloudflare/workers-types": "^5.20261020.0",
+    "@types/leaflet": "^1.9.20",
+    "esbuild": "^0.28.0",
+    "ionicons": "^8.0.0",
+    "leaflet": "^1.9.4",
+    "typescript": "~6.0.3",
+    "wrangler": "^4.157.0"
   }
 }

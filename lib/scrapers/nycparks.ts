@@ -32,7 +32,7 @@ function to24Hour(time: string) {
   return `${String(hour).padStart(2, '0')}:${match[2]}`;
 }
 
-// The feed links over http, which iOS blocks
+// The feed links over http, which browsers block on an https page
 const https = (url: string) => url.replace(/^http:/, 'https:');
 
 function toRawEvent(event: ParksEvent): RawEvent | null {

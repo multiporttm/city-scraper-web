@@ -71,7 +71,7 @@ function toRawEvent(event: TicketmasterEvent, startAt: string): RawEvent {
 }
 
 export const fetchTicketmaster: Scraper = async ({ latitude, longitude, radiusMiles, from, to }) => {
-  // Server-only secret: no EXPO_PUBLIC_ prefix, so it's never bundled into the app
+  // Worker secret (wrangler secret put), never sent to the browser
   const apiKey = process.env.TICKETMASTER_API_KEY;
   if (!apiKey) throw new Error('TICKETMASTER_API_KEY is not set');
 

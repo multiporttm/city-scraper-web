@@ -1,8 +1,6 @@
-import type { Ionicons } from '@expo/vector-icons';
+import type { EventCategory, EventIcon, EventSource, EventTone } from '@/types/events';
 
-import type { EventCategory, EventSource, EventTone } from '@/types/events';
-
-type CategoryStyle = { tone: EventTone; icon: keyof typeof Ionicons.glyphMap };
+type CategoryStyle = { tone: EventTone; icon: EventIcon };
 
 // Card color and map pin icon for each category
 export const CATEGORY_STYLES: Record<EventCategory, CategoryStyle> = {

@@ -65,7 +65,7 @@ export const fetchLuma: Scraper = async ({ latitude, longitude, to }) => {
     try {
       data = await fetchJson<LumaPage>(`${API}?${params}`);
     } catch (error) {
-      // Keep the pages already fetched, e.g. when EAS Hosting's per-request fetch cap cuts the paging short
+      // Keep the pages already fetched, e.g. when the Workers subrequest cap (50 per request on the Free plan) cuts the paging short
       if (page === 0) throw error;
       console.warn(`[events] luma stopped after ${page} pages: ${error instanceof Error ? error.message : error}`);
       break;

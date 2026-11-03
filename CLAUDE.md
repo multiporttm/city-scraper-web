@@ -6,21 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- `npm start` — Expo dev server (`npm run ios` / `android` / `web` to target a platform)
-- `npm run lint` — `expo lint` (ESLint with `eslint-config-expo`)
-- Type-check: `npx tsc --noEmit` (strict mode is on)
-- There is no test runner configured yet.
+- `npm run dev` — builds the browser app and runs the site + Worker locally with `wrangler dev` (http://localhost:8787); rebuilds on changes
+- `npm run build` — bundles `web/` into `public/build/` with esbuild (`build.mjs`)
+- `npm run typecheck` — `tsc` for the browser app (`tsconfig.json`) and the Worker (`worker/tsconfig.json`), strict mode
+- `npm run deploy` — builds and deploys to Cloudflare (`wrangler deploy`)
+- There is no test runner or linter configured yet.
 
 ## Current state
 
-The `(tabs)` group exists (`index`, `pinned`, `settings`) under a root `Stack` with headers hidden. Zustand + AsyncStorage stores live in `store/`. The `(auth)` group and Clerk are not set up yet.
+A plain HTML/CSS/TypeScript single-page app (no UI framework) served by Cloudflare Workers. It was converted from an Expo / React Native app; the screens, behaviour and look are the same.
 
-Events are real, scraped on demand by the Expo Router API route `app/api/events+api.ts` (`GET /api/events?location=&distance=&days=&times=&interests=`, the raw preference strings). It calls `lib/scrapers/` (one adapter per source), normalizes to `EventItem` (`lib/scrapers/normalize.ts`, categories from `lib/categorize.ts`), then filters and ranks by distance/availability/interests (`lib/ranking.ts`). Sources: Luma (its internal discover API, by coordinates), Meetup (GraphQL `api.meetup.com/gql-ext`, no token needed for search), Eventbrite (NYC search pages' `window.__SERVER_DATA__`, plus optional official-API price lookups), NYC Parks (live JSON feed; the Open Data dataset is stale), and key-gated Ticketmaster, SeatGeek and PredictHQ. Keys go in `.env.local` (see `.env.example`). A source without its key is skipped. Eventbrite and NYC Parks only run near NYC. Results are cached for 30 min per source on `globalThis` (the dev server re-runs API modules per request). The app fetches it with `hooks/useEvents.ts`. Pinned events are stored as whole objects in `store/events.ts`. The Supabase/Python backend described in `AGENTS.md` is still a later step.
+- `public/index.html` is the only page. `web/main.ts` routes by pathname (`/sign-in`, `/quiz`, `/`, `/pinned`, `/settings`); `wrangler.jsonc` sets `not_found_handling: single-page-application` so every path gets `index.html`.
+- State lives in small persisted stores (`web/store.ts`, localStorage), defined in `web/state.ts` (auth, profile, preferences, pinned/archived events). Sign-in is a local stand-in (just a first name).
+- `web/feed.ts` fetches `/api/events` with the saved preferences and refetches when they change.
+- Explore (`web/screens/explore.ts`) is a Leaflet map (OpenStreetMap tiles darkened with a CSS filter) under a stack of tilted cards. Drag/swipe right pins, left archives (`web/components/swipe.ts`); arrow keys do the same on desktop.
+
+Events are scraped on demand by the Worker (`worker/index.ts`, `GET /api/events?location=&distance=&days=&times=&interests=`, the raw preference strings). It calls `lib/scrapers/` (one adapter per source), normalizes to `EventItem` (`lib/scrapers/normalize.ts`, categories from `lib/categorize.ts`), then filters and ranks by distance/availability/interests (`lib/ranking.ts`). Sources: Luma (its internal discover API, by coordinates), Meetup (GraphQL `api.meetup.com/gql-ext`), Eventbrite (NYC search pages' `window.__SERVER_DATA__`, plus optional official-API price lookups), NYC Parks (live JSON feed), and key-gated Ticketmaster, SeatGeek and PredictHQ. Keys are Worker secrets: `.dev.vars` locally (see `.dev.vars.example`), `wrangler secret put` in production; the `nodejs_compat` flag exposes them on `process.env`. A source without its key is skipped. Eventbrite and NYC Parks only run near NYC. Results are cached for 30 min per source in memory for the life of the Worker isolate. City search in the forms calls Open-Meteo's geocoder straight from the browser (`lib/cities.ts`).
 
 ## Architecture notes
 
-- **Routing**: Expo Router (file-based) in `app/`. Screens only compose components, hooks and stores. Reusable UI goes in `components/`, hardcoded data in `data/` (e.g. `data/settings.ts` drives the settings screen), images through `constants/images.ts`.
-- **Path alias**: `@/*` maps to the repo root (e.g. `@/global.css`, `@/components/...`).
-- **Styling is NativeWind v5 (`5.0.0-rc.0`) on Tailwind 4 and `react-native-css`**, not v4. Don't use v2/v4 patterns (no `tailwind.config.js`, no `babel` preset). Theme and utilities live in `global.css`, imported once in `app/_layout.tsx`. Per `AGENTS.md`, use Tailwind classes only (no `StyleSheet`), and put reusable class groups in `global.css` as BEM-named classes with `@apply` (e.g. `.empty-state__title`). Don't upgrade NativeWind without approval.
-- **Metro config** (`metro.config.js`) wraps the default config with `withNativewind`. NativeWind v5 replaces `react-native` with its own wrapper that lacks `AssetRegistry`, so a custom `resolveRequest` hands the real `react-native` to `expo-asset` and `expo-image`. Keep that workaround if you touch the resolver.
-- **Settings screen** is dark (`.settings-screen`), while the other tab screens use the light violet theme (`.tab-screen`).
+- **Path alias**: `@/*` maps to the repo root in both tsconfigs and in esbuild/Wrangler (e.g. `@/lib/times`, `@/web/dom`).
+- `lib/`, `data/`, `constants/` and `types/` are shared by the browser app and the Worker, so keep them free of DOM-only or Worker-only APIs (the scrapers are Worker-only).
+- **Styling** is plain CSS in `web/styles.css` (bundled to `public/build/main.css`), BEM class names, dark theme. No Tailwind.
+- **DOM**: `h()` in `web/dom.ts` builds elements; screens are functions returning elements (tab screens return `{ element, show, hide }` and stay mounted while hidden).
+- **Icons**: Ionicons SVGs imported as text in `web/icons.ts` (via the `ionicons-svg` alias in `build.mjs`); PNG icons in `public/images/` are tinted with `tintedImage()`.
+- **Cloudflare limits**: the Free plan allows 50 subrequests and 10 ms CPU per request; a full scrape can use ~40 fetches and more CPU than that, so the Workers Paid plan is recommended (see README).

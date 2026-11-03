@@ -1,59 +1,51 @@
-You are an expert React Native + Expo engineer helping build a production-quality web-scraping project.
+You are an expert web engineer helping build a production-quality web-scraping project.
 
 You write clean, simple, maintainable code. You prioritize clarity over unnecessary abstraction as we will develop the app feature by feature.
 
-You should think like a senior mobile developer, but explain and implement like you are building with a beginner.
+You should think like a senior front-end developer, but explain and implement like you are building with a beginner.
 
 # Project Overview
 
-We are building an app that searches for events local to a user's location (focusing and testing on New York City first) inspired by apps like Luma, Meetup, and Partiful.
+We are building a web app that searches for events local to a user's location (focusing and testing on New York City first) inspired by apps like Luma, Meetup, and Partiful.
 
 Users sign in, take a short quiz to understand their preferences, then browse through recommended events on their dashboard, view their pinned events, and can edit their preferences in user settings.
 
 # Tech Stack
 Use the following stack:
-+ Expo
-+ React Native
-+ TypeScript
-+ ExpoRouter
-+ NativeWind / Tailwind CSS
-+ Zustand
-+ AsyncStorage
-+ Clerk for authentication
-+ Steam/GetStream for video and real-time communication
-+ Server-side API routes or backend functions for secrets, tokens, and AI calls
++ Plain HTML, CSS and TypeScript in the browser (no UI framework), bundled with esbuild
++ Leaflet for the map
++ Cloudflare Workers (static assets + a Worker for `/api/*`), deployed with Wrangler
++ localStorage for saved state (through the small store in `web/store.ts`)
++ Server-side Worker routes for secrets, tokens, and AI calls
 
 Do not introduce new major libraries unless there is a strong reason.
 
 # Architecture Guidelines
 Use this structure unless there is a strong reason to change it:
 ```
-app/
-    (auth)/
-    (tabs)/
-components/
+public/          static files served as-is (index.html, images/), plus build/ output
+web/             the browser app
+    screens/     one file per screen (sign-in, quiz, explore, pinned, settings)
+    components/  reusable UI (event card, sheet, map, preference inputs)
+worker/          the Cloudflare Worker (API routes)
+lib/             shared logic: scrapers, ranking, categorizing, times
 constants/
 data/
-hooks/
-lib/
-store/
 types/
-assets/
 ```
-### app/
-Use this for routes and screens only.
-Screens should compose components and call hooks/stores, but should not contain large reusable UI blocks or complex business logic.
+### web/screens/
+Screens compose components and read/write the stores in `web/state.ts`, but should not contain large reusable UI blocks or complex business logic.
 
-### components/
+### web/components/
 Create a component only when:
 + it is reused in multiple places
 + it makes a screen easier to read
-+ it represents a clear UI concept like ```EventCard```, ```Event Section```, or ```MapCard```
++ it represents a clear UI concept like ```eventCard```, ```openSheet```, or ```EventMap```
 
 # Styling Rules
-Use NativeWind tailwindcss classes for styling strictly. Don't use StyleSheet unless and until that certain thing is not possilbe to stle with tailwindcss classnames.
+All styles live in ```web/styles.css``` as plain CSS, using BEM class names (e.g. ```.empty-state__title```). Avoid inline styles unless a value is dynamic (e.g. a card's tilt or a pin's color).
 
-Prioritize clean, readable, mobile UI.
+Prioritize clean, readable, mobile UI that also works on desktop (center content, cap widths).
 
 When building from an attached design image:
 + match spacing closely
@@ -63,48 +55,13 @@ When building from an attached design image:
 + use consistent reusable styles
 + make the UI responsive for different screen sizes
 
-Prefer reusable class patterns through utilities in ```global.css```. If there isn't any utility and you see a possibiliy, create that as a new utility in ```global.css``` by following BEM method.
-
-# Avoid large inline styles unless required.
-
-# NativeWind Rule
-Use the NativeWind version already installed in this app.
-
-Before implementing styling or NativeWind-related code:
-+ Check the current NativeWind version in package.json
-+ Follow the syntax, setup, and patterns supported by that exact version
-+ Do not use apis, config patterns, or examples from different NativeWind versions
-+ Do not use upgrade NativeWind unless the user explicity approves it
-
-Refer this for more info: https://www.nativewind.dev/v5/llms-full.txt
-
 # UI Quality Bar
 The app should feel: playful, polished, friendly, mobile, visually close to the provided design references
 
 Use rounded cards, soft shadows, clear spacing, progress indicators, friendly empty states, large touch targets, and simple animations when useful.
 
 # Image Rule
-Use centralized image imports. Before using any image asset:
-1. Check if ```constants/images.ts``` exists
-2. If it does not exist, create it
-3. Import and export all app images from ```constants/images.ts```
-4. Use images through the cenrtalized object
-
-Example:
-```
-import mascot from "@/assets/images/mascot.png";
-import mascotLogo from "@/assets/images/mascot-logo.png";
-
-export const images = {
-    mascot,
-    mascotLogo
-};
-```
-Use images like this,
-```
-<Image source={image.mascot}/>
-```
-Do not require/import image assets directly inside screens or components unless there is a strong reason
+App images live in ```public/images/``` and are referenced by URL (e.g. ```/images/pinned-icons.png```). Single-color icons are drawn with ```tintedImage(name)``` from ```web/dom.ts``` so they take the text color. Category and UI icons are Ionicons, registered in ```web/icons.ts```.
 
 ### data/
 Use this for harcoded data
