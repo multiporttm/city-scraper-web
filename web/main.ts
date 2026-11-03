@@ -1,4 +1,4 @@
-import 'leaflet/dist/leaflet.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import '@/web/styles.css';
 
 import { cx, h, tintedImage } from '@/web/dom';

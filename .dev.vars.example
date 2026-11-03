@@ -14,7 +14,7 @@ PREDICTHQ_TOKEN=
 # Optional, fills in Eventbrite ticket prices. Private token: https://www.eventbrite.com/platform/api-keys
 EVENTBRITE_TOKEN=
 
-# Apple Maps (MapKit JS) for the Explore map. Without these the map falls back to OpenStreetMap.
+# Apple Maps (MapKit JS) for the Explore map. Without these the map uses the free OpenFreeMap map.
 # Needs an Apple Developer account: create a Maps ID and a MapKit JS private key at
 # https://developer.apple.com/account/resources/authkeys, then paste the .p8 file's contents here (keep the quotes).
 APPLE_MAPKIT_TEAM_ID=

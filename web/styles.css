@@ -519,29 +519,26 @@ a {
   background: rgb(34 35 36 / 0.94);
 }
 
-/* Light OpenStreetMap tiles turned into a dark map */
-.event-map-tiles {
-  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9) saturate(0.6);
-}
-
-/* Leaflet controls in the app's dark style */
-.leaflet-container {
-  background: var(--surface);
+/* Map controls in the app's dark style */
+.maplibregl-map {
   font: inherit;
 }
 
-.leaflet-top.leaflet-right {
+.maplibregl-ctrl-top-right {
   top: env(safe-area-inset-top);
 }
 
-.leaflet-control-attribution.leaflet-control {
+.maplibregl-ctrl.maplibregl-ctrl-attrib {
   background: rgb(0 0 0 / 0.55);
   color: var(--text-muted);
-  font-size: 10px;
 }
 
-.leaflet-control-attribution a {
+.maplibregl-ctrl-attrib a {
   color: #d4d4d4;
+}
+
+.maplibregl-ctrl-attrib-button {
+  filter: invert(1);
 }
 
 /* Pinned list */

@@ -24,7 +24,7 @@ function unseen(events: EventItem[]) {
 
 // Full-screen map with the feed as a stack of cards: drag right to pin, left to archive, click to recenter or open.
 export function exploreScreen(): TabScreen {
-  // Leaflet sets `position: relative` on its container when it's created before being added to the page,
+  // Map libraries set their own positioning on the element they draw into,
   // so the map gets its own element inside the absolutely positioned layer
   const mapCanvas = h('div', { class: 'discover-screen__map-canvas' });
   const mapElement = h('div', { class: 'discover-screen__map' }, mapCanvas);
@@ -204,7 +204,7 @@ export function exploreScreen(): TabScreen {
     show: () => {
       visible = true;
       loadFeed();
-      // The map was hidden, so Leaflet re-measures before drawing (and re-centers, unless the user had panned away)
+      // The map was hidden, so it re-measures before drawing (and re-centers, unless the user had panned away)
       requestAnimationFrame(() => {
         map.resize();
         if (centered) map.recenter();
