@@ -2,14 +2,6 @@
 
 Event exploration and management tool. Scrapes event-hosting websites like Luma, EventBrite, and Ticketmaster's public APIs to suggest events for users based on their inputted location, availability throughout the week, location, and range of commutable distance.
 
-Try it yourself, clone the repo and run
-
-```
-npm install
-npx expo start
-```
-
-then, open it in your browser or the Expo Go app.
 
 ## Screenshots
 
@@ -34,25 +26,11 @@ On signing in, users enter basic information and their preferences for events, t
 </div>
 <br>
 
-Check out this [video demo](https://youtu.be/IEIi_-E4XUI) - submitted to the 2026 Congressional App Challenge.
+
 
 ## Try it yourself
 
-Download the Expo Go app and scan the QR code
+Download the Expo Go app and go to:
 
-<img src="screenshots/functionality/qr-code.png" width="150" height="150" alt="Part of failing the cooking sequence">
+exp://u.expo.dev/6088bc15-e538-42e2-8b29-00149cb2aa9a/group/cb6ed6bd-fad6-47a0-abee-40727087a94f
 
-<!-- ## Deploying
-
-The `/api/events` scraper runs on EAS Hosting at https://emilyahmad.expo.app, and the app reaches it through the `origin` set on the `expo-router` plugin in `app.json`. The phone app is delivered with EAS Update and opened in Expo Go.
-
-```bash
-# API / scraper or web changes
-npx expo export -p web && eas deploy --prod
-
-# App changes. Exports plain JS (Expo Go can't run Hermes bytecode) and publishes to the production channel
-npm run update -- --message "..."
-
-# API keys for the key-gated sources
-eas env:create --environment production --visibility secret --name TICKETMASTER_API_KEY --value ...
-``` -->
