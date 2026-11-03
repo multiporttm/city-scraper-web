@@ -1,15 +1,14 @@
 import * as maplibregl from 'maplibre-gl';
 
+import { appleLikeStyle } from '@/web/components/mapStyle';
 import { MAX_PINS, NYC, PIN_Y_RATIO, pinHtml, REGION_PADDING_RATIO, type EventMapOptions, type MapBackend } from '@/web/components/mapShared';
 import type { EventItem } from '@/types/events';
 
 // OpenFreeMap: free vector map tiles on OpenStreetMap data, with no API key, sign-up or view limit.
-// Its dark style is already simple (no shop or venue icons); a few more busy layers are hidden below.
+// Its dark style is the starting point; mapStyle.ts repaints it to look like Apple Maps' dark mode.
 const STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
 // Copied next to the bundle by build.mjs
 maplibregl.setWorkerUrl('/build/maplibre-gl-worker.mjs');
-// (landcover_wood needs a texture the style doesn't ship, so it would draw nothing anyway)
-const HIDDEN_LAYERS = ['landcover_wood', 'road_oneway', 'road_oneway_opposite', 'aeroway-taxiway', 'aeroway-runway-casing', 'aeroway-area', 'aeroway-runway'];
 
 const START_ZOOM = 12;
 const FOCUS_ZOOM = 13;
@@ -19,7 +18,7 @@ const JUMP_DISTANCE_M = 20_000;
 
 type Pin = { marker: maplibregl.Marker; active: boolean; event: EventItem };
 
-// The map when Apple Maps isn't set up: MapLibre drawing OpenFreeMap's dark vector style.
+// The map when Apple Maps isn't set up: MapLibre drawing OpenFreeMap's data in an Apple Maps-like dark style.
 export class FallbackMap implements MapBackend {
   private map: maplibregl.Map;
   private pins = new Map<string, Pin>();
@@ -29,7 +28,7 @@ export class FallbackMap implements MapBackend {
   constructor(private container: HTMLElement, private options: EventMapOptions) {
     this.map = new maplibregl.Map({
       container,
-      // An empty style first; the real one is set below so its busy layers can be dropped before anything draws
+      // An empty style first; the real one is set below so it can be repainted before anything draws
       style: { version: 8, sources: {}, layers: [] },
       center: [NYC.longitude, NYC.latitude],
       zoom: START_ZOOM,
@@ -44,7 +43,7 @@ export class FallbackMap implements MapBackend {
     this.map.addControl(new maplibregl.AttributionControl({ compact: true }), 'top-right');
 
     this.map.setStyle(STYLE_URL, {
-      transformStyle: (_previous, next) => ({ ...next, layers: next.layers.filter((layer) => !HIDDEN_LAYERS.includes(layer.id)) }),
+      transformStyle: (_previous, next) => appleLikeStyle(next),
     });
 
     this.collapseCredits();

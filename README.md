@@ -58,5 +58,5 @@ Notes:
   1. In your Apple Developer account ([Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources)), create a **Maps ID**, then a **key** with **MapKit JS** enabled for it, and download the `.p8` file.
   2. Set the secrets: `npx wrangler secret put APPLE_MAPKIT_TEAM_ID` (your Team ID), `APPLE_MAPKIT_KEY_ID` (the key's ID), and `APPLE_MAPKIT_PRIVATE_KEY` (paste the whole `.p8` file). For local dev, put them in `.dev.vars`.
   3. The Worker signs a 30-minute token for each visitor at `/api/mapkit-token`, locked to your site's origin; the private key never reaches the browser.
-- Without Apple keys, the map is a free dark map from [OpenFreeMap](https://openfreemap.org) (OpenStreetMap data, drawn with MapLibre): no key, sign-up or view limit.
+- Without Apple keys, the map uses free data from [OpenFreeMap](https://openfreemap.org) (OpenStreetMap, drawn with MapLibre), styled to look like Apple Maps' dark mode: no key, sign-up or view limit. The colors live in `web/components/mapStyle.ts`.
 - Sign-in is a local stand-in: the name, preferences and pinned events are kept in the browser's localStorage.
