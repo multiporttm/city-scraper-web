@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` — builds the browser app and runs the site + Pages Functions locally with `wrangler pages dev` (http://localhost:8788)
 - `npm run watch` — rebuilds the browser app on changes (run alongside `dev`)
 - `npm run build` — bundles `web/` into `public/build/` with esbuild (`build.mjs`); this is the Cloudflare Pages build command, output directory `public`
+- **`public/build/` is committed.** After changing anything the browser app uses (`web/`, `lib/`, `data/`, `constants/`, `types/`), run `npm run build` and commit `public/build/` with the change, so the deployed site never depends on Cloudflare's build step running.
 - `npm run typecheck` — `tsc` for the browser app (`tsconfig.json`) and the functions/server code (`functions/tsconfig.json`), strict mode
 - `npm run deploy` — builds and deploys with `wrangler pages deploy` (normally deploys happen from the Cloudflare dashboard's Git integration)
 - There is no test runner or linter configured yet.

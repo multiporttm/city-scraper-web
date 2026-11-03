@@ -67,4 +67,3 @@ example
 .wrangler/
 .dev.vars*
 !.dev.vars.example
-public/build/

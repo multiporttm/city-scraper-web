@@ -1,4 +1,6 @@
 // Bundles the browser app (web/main.ts and the CSS it imports) into public/build/.
+// The output is committed, so Cloudflare Pages can serve it even if its build step doesn't run:
+// run `npm run build` and commit public/build/ after changing anything in web/, lib/, data/, constants/ or types/.
 // `npm run build -- --watch` rebuilds on change.
 import { copyFileSync, mkdirSync } from 'node:fs';
 
@@ -11,7 +13,8 @@ const options = {
   format: 'esm',
   target: 'es2022',
   minify: true,
-  sourcemap: true,
+  // Only while watching: the built files are committed, so they're kept small
+  sourcemap: process.argv.includes('--watch'),
   tsconfig: 'tsconfig.json',
   // Lets the fallback map load as its own file, only when it's needed
   splitting: true,
