@@ -1,20 +1,10 @@
 {
+  // Cloudflare Pages project settings. When this file is in the repo, Pages uses it as the source of truth
+  // for these settings (they show as read-only in the dashboard). Secrets are still set in the dashboard.
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "city-scraper",
-  "main": "worker/index.ts",
+  // What `npm run build` produces: the static site, including public/build/ (the bundled app)
+  "pages_build_output_dir": "./public",
   "compatibility_date": "2026-10-01",
-  // Fills process.env from vars and secrets, which the scrapers read their API keys from
-  "compatibility_flags": ["nodejs_compat"],
-  "tsconfig": "worker/tsconfig.json",
-  // Bundles the browser app into public/build before every dev run and deploy
-  "build": { "command": "npm run build", "watch_dir": ["web", "lib", "data", "constants", "types"] },
-  "assets": {
-    "directory": "./public",
-    "binding": "ASSETS",
-    // Unknown paths like /pinned get index.html, and the app's router picks the screen
-    "not_found_handling": "single-page-application",
-    // Only the API reaches the Worker; everything else is served straight from the static assets
-    "run_worker_first": ["/api/*"]
-  },
-  "observability": { "enabled": true }
+  "compatibility_flags": ["nodejs_compat"]
 }

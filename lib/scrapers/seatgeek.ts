@@ -1,3 +1,4 @@
+import { getEnv } from '@/lib/env';
 import { fetchJson, stripHtml } from '@/lib/scrapers/http';
 import type { RawEvent, Scraper } from '@/lib/scrapers/types';
 
@@ -49,7 +50,7 @@ function toRawEvent(event: SeatGeekEvent): RawEvent {
 
 export const fetchSeatGeek: Scraper = async ({ latitude, longitude, radiusMiles, from, to }) => {
   // Server-only secret, like the Ticketmaster key
-  const clientId = process.env.SEATGEEK_CLIENT_ID;
+  const clientId = getEnv('SEATGEEK_CLIENT_ID');
   if (!clientId) throw new Error('SEATGEEK_CLIENT_ID is not set');
 
   const events: RawEvent[] = [];

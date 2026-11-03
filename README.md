@@ -34,29 +34,32 @@ Needs Node 20+.
 
 ```sh
 npm install
-cp .dev.vars.example .dev.vars   # optional: API keys for Ticketmaster, SeatGeek, PredictHQ, Eventbrite prices
-npm run dev                      # http://localhost:8787
+cp .dev.vars.example .dev.vars   # optional: API keys for Ticketmaster, SeatGeek, PredictHQ, Eventbrite prices, Apple Maps
+npm run dev                      # http://localhost:8788 (Cloudflare Pages, run locally)
 ```
 
-The site is plain HTML, CSS and TypeScript (`public/`, `web/`), bundled with esbuild. The Cloudflare Worker in `worker/` serves `GET /api/events`, which scrapes the sources in `lib/scrapers/` and ranks the results for the user's preferences.
+The site is plain HTML, CSS and TypeScript (`public/`, `web/`), bundled with esbuild into `public/build/`. The API runs as Cloudflare Pages Functions in `functions/api/`: `GET /api/events` scrapes the sources in `lib/scrapers/` and ranks the results for the user's preferences. Run `npm run watch` in a second terminal to rebuild the browser app as you edit.
 
-## Deploy to Cloudflare
+## Deploy on Cloudflare Pages (dashboard)
 
-```sh
-npx wrangler login
-npm run deploy                                  # builds, uploads public/ as static assets and deploys the Worker
-npx wrangler secret put TICKETMASTER_API_KEY    # repeat for any keys in .dev.vars.example you want on
-```
+1. In the Cloudflare dashboard, go to **Workers & Pages → Create → Pages → Connect to Git** and pick this repository.
+2. Build settings:
+   - **Framework preset:** None
+   - **Build command:** `npm run build`
+   - **Build output directory:** `public`
+   - **Production branch:** the branch you deploy from (e.g. `main`)
+3. **Save and Deploy.** The site is live at `https://<project>.pages.dev`, and every push to the branch redeploys it.
+4. Optional keys: your project → **Settings → Variables and Secrets → Add**, using the names in `.dev.vars.example` (e.g. `TICKETMASTER_API_KEY`). Add them as **Secret** for Production (and Preview if you want). Then redeploy (**Deployments → … → Retry deployment**) so they take effect.
 
-The app is then live at `https://city-scraper.<your-subdomain>.workers.dev` (add a custom domain in the Cloudflare dashboard). You can also connect the GitHub repo in **Workers & Pages → Create → Import a repository** with build command `npm run build` and deploy command `npx wrangler deploy`.
+`wrangler.jsonc` holds the Pages settings (output folder, compatibility date and the `nodejs_compat` flag), so those show as read-only in the dashboard. You can also deploy from your computer with `npx wrangler login` then `npm run deploy`.
 
 Notes:
 
-- **Use the Workers Paid plan ($5/month) for reliable results.** A full scrape makes about 40 outbound requests and parses a few thousand events. The Free plan caps each request at 50 subrequests and 10 ms of CPU, so requests can be cut short. Turning on `EVENTBRITE_TOKEN` adds up to 60 more requests.
-- Results are cached in memory for 30 minutes per source, per Worker instance.
+- **Use the Workers Paid plan ($5/month) for reliable results.** Pages Functions run on Workers and share its limits. A full scrape makes about 40 outbound requests and parses a few thousand events; the Free plan caps each request at 50 subrequests and 10 ms of CPU, so requests can be cut short. (Upgrade under **Workers & Pages → Plans**.) Turning on `EVENTBRITE_TOKEN` adds up to 60 more requests.
+- Results are cached in memory for 30 minutes per source, per running instance.
 - **Apple Maps** draws the Explore map once its keys are set (otherwise it uses the free OpenFreeMap map below):
   1. In your Apple Developer account ([Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources)), create a **Maps ID**, then a **key** with **MapKit JS** enabled for it, and download the `.p8` file.
-  2. Set the secrets: `npx wrangler secret put APPLE_MAPKIT_TEAM_ID` (your Team ID), `APPLE_MAPKIT_KEY_ID` (the key's ID), and `APPLE_MAPKIT_PRIVATE_KEY` (paste the whole `.p8` file). For local dev, put them in `.dev.vars`.
-  3. The Worker signs a 30-minute token for each visitor at `/api/mapkit-token`, locked to your site's origin; the private key never reaches the browser.
+  2. In the Pages project's **Variables and Secrets**, add `APPLE_MAPKIT_TEAM_ID` (your Team ID), `APPLE_MAPKIT_KEY_ID` (the key's ID), and `APPLE_MAPKIT_PRIVATE_KEY` (paste the whole `.p8` file) as secrets. For local dev, put them in `.dev.vars`.
+  3. The site's function signs a 30-minute token for each visitor at `/api/mapkit-token`, locked to your site's origin; the private key never reaches the browser.
 - Without Apple keys, the map uses free data from [OpenFreeMap](https://openfreemap.org) (OpenStreetMap, drawn with MapLibre), styled to look like Apple Maps' dark mode: no key, sign-up or view limit. The colors live in `web/components/mapStyle.ts`. Map labels use the LandUI Pro font, pre-cut into glyph files in `public/fonts/`; to change the font, follow the steps at the top of `scripts/build-map-glyphs.mjs`.
 - Sign-in is a local stand-in: the name, preferences and pinned events are kept in the browser's localStorage.

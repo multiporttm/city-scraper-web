@@ -14,9 +14,9 @@ Users sign in, take a short quiz to understand their preferences, then browse th
 Use the following stack:
 + Plain HTML, CSS and TypeScript in the browser (no UI framework), bundled with esbuild
 + Apple Maps (MapKit JS) for the map, with MapLibre + OpenFreeMap (free, no key) as the fallback when Apple keys aren't set
-+ Cloudflare Workers (static assets + a Worker for `/api/*`), deployed with Wrangler
++ Cloudflare Pages (static site + Pages Functions for `/api/*`), deployed from the Cloudflare dashboard's Git integration
 + localStorage for saved state (through the small store in `web/store.ts`)
-+ Server-side Worker routes for secrets, tokens, and AI calls
++ Pages Functions for secrets, tokens, and AI calls
 
 Do not introduce new major libraries unless there is a strong reason.
 
@@ -27,7 +27,8 @@ public/          static files served as-is (index.html, images/), plus build/ ou
 web/             the browser app
     screens/     one file per screen (sign-in, quiz, explore, pinned, settings)
     components/  reusable UI (event card, sheet, map, preference inputs)
-worker/          the Cloudflare Worker (API routes)
+functions/       Cloudflare Pages Functions (API routes, e.g. functions/api/events.ts)
+server/          server-side handlers the functions call
 lib/             shared logic: scrapers, ranking, categorizing, times
 constants/
 data/

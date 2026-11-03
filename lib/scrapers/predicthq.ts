@@ -1,3 +1,4 @@
+import { getEnv } from '@/lib/env';
 import { fetchJson } from '@/lib/scrapers/http';
 import type { RawEvent, Scraper } from '@/lib/scrapers/types';
 
@@ -51,7 +52,7 @@ function toRawEvent(event: PredictHqEvent): RawEvent {
 
 export const fetchPredictHq: Scraper = async ({ latitude, longitude, radiusMiles, from, to }) => {
   // Server-only secret
-  const token = process.env.PREDICTHQ_TOKEN;
+  const token = getEnv('PREDICTHQ_TOKEN');
   if (!token) throw new Error('PREDICTHQ_TOKEN is not set');
 
   const params = new URLSearchParams({

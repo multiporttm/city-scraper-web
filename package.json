@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p worker",
-    "cf-typegen": "wrangler types"
+    "watch": "node build.mjs --watch",
+    "dev": "npm run build && wrangler pages dev",
+    "deploy": "npm run build && wrangler pages deploy",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p functions"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261020.0",

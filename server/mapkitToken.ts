@@ -1,10 +1,11 @@
 // Signs short-lived MapKit JS tokens so the browser can show Apple Maps.
 // Needs a Maps ID and a MapKit JS private key from an Apple Developer account
-// (developer.apple.com/account/resources/authkeys), set as Worker secrets:
+// (developer.apple.com/account/resources/authkeys), set as Pages secrets (dashboard → Settings → Variables and Secrets):
 //   APPLE_MAPKIT_TEAM_ID      10-character Team ID
 //   APPLE_MAPKIT_KEY_ID       10-character Key ID of the MapKit JS key
 //   APPLE_MAPKIT_PRIVATE_KEY  contents of the downloaded AuthKey_XXXXXXXXXX.p8 file
 // The private key stays on the server; the browser only ever sees signed tokens.
+import { getEnv } from '@/lib/env';
 
 const TOKEN_LIFETIME_S = 30 * 60;
 // Hand out a fresh token well before the old one expires
@@ -28,7 +29,7 @@ function importKey(pem: string) {
 const cache = new Map<string, { token: string; issuedAt: number }>();
 
 export const mapkitConfigured = () =>
-  !!(process.env.APPLE_MAPKIT_TEAM_ID && process.env.APPLE_MAPKIT_KEY_ID && process.env.APPLE_MAPKIT_PRIVATE_KEY);
+  !!(getEnv('APPLE_MAPKIT_TEAM_ID') && getEnv('APPLE_MAPKIT_KEY_ID') && getEnv('APPLE_MAPKIT_PRIVATE_KEY'));
 
 // An ES256 JWT for MapKit JS, locked to the site's origin so it can't be reused elsewhere
 export async function mapkitToken(origin: string) {
@@ -36,13 +37,13 @@ export async function mapkitToken(origin: string) {
   const cached = cache.get(origin);
   if (cached && now - cached.issuedAt < REUSE_FOR_S) return cached.token;
 
-  keyPromise ??= importKey(process.env.APPLE_MAPKIT_PRIVATE_KEY!);
+  keyPromise ??= importKey((getEnv('APPLE_MAPKIT_PRIVATE_KEY') ?? ''));
   const key = await keyPromise.catch((error: unknown) => {
     keyPromise = null;
     throw error;
   });
-  const header = { alg: 'ES256', kid: process.env.APPLE_MAPKIT_KEY_ID, typ: 'JWT' };
-  const payload = { iss: process.env.APPLE_MAPKIT_TEAM_ID, iat: now, exp: now + TOKEN_LIFETIME_S, origin };
+  const header = { alg: 'ES256', kid: getEnv('APPLE_MAPKIT_KEY_ID'), typ: 'JWT' };
+  const payload = { iss: getEnv('APPLE_MAPKIT_TEAM_ID'), iat: now, exp: now + TOKEN_LIFETIME_S, origin };
   const unsigned = `${encodeJson(header)}.${encodeJson(payload)}`;
   // WebCrypto returns the raw r‖s signature, which is the form JWT's ES256 uses
   const signature = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, new TextEncoder().encode(unsigned));

@@ -2,8 +2,6 @@ import { geocodeCity, type Coordinates } from '@/lib/cities';
 import { rankEvents } from '@/lib/ranking';
 import { scrapeEvents } from '@/lib/scrapers';
 
-import { mapkitConfigured, mapkitToken } from './mapkitToken';
-
 // How far ahead the feed looks
 const WINDOW_DAYS = 14;
 const DEFAULT_DISTANCE_MILES = 5;
@@ -18,7 +16,7 @@ async function locate(location: string) {
 
 // GET /api/events?location=&distance=&days=&times=&interests=
 // Takes the saved preference strings as they are, scrapes every source and returns the events that fit, best first.
-async function getEvents(request: Request) {
+export async function getEvents(request: Request) {
   const params = new URL(request.url).searchParams;
   const location = params.get('location')?.trim() ?? '';
   const center = location ? await locate(location) : null;
@@ -45,22 +43,3 @@ async function getEvents(request: Request) {
 
   return Response.json({ events: ranked, sources: statuses });
 }
-
-// Static files (public/) are served before the Worker runs; only /api/* gets here (see run_worker_first in wrangler.jsonc).
-export default {
-  async fetch(request, env) {
-    const { pathname } = new URL(request.url);
-    if (pathname === '/api/events') {
-      if (request.method !== 'GET') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET' } });
-      return getEvents(request);
-    }
-    // GET /api/mapkit-token: a signed token for Apple Maps (MapKit JS), or 503 when the Apple keys aren't set
-    if (pathname === '/api/mapkit-token') {
-      if (!mapkitConfigured()) return new Response('Apple Maps is not configured', { status: 503 });
-      const token = await mapkitToken(new URL(request.url).origin);
-      return new Response(token, { headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' } });
-    }
-    if (pathname.startsWith('/api/')) return Response.json({ error: 'Not found' }, { status: 404 });
-    return env.ASSETS.fetch(request);
-  },
-} satisfies ExportedHandler<Env>;

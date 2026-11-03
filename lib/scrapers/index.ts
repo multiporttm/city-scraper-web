@@ -1,3 +1,4 @@
+import { getEnv } from '@/lib/env';
 import { distanceMiles } from '@/lib/cities';
 import { fetchEventbrite } from '@/lib/scrapers/eventbrite';
 import { fetchLuma } from '@/lib/scrapers/luma';
@@ -22,7 +23,7 @@ type Source = {
   source: EventSource;
   scrape: Scraper;
   nycOnly: boolean;
-  // Worker secret the source needs (.dev.vars locally, wrangler secret put in production); skipped without it
+  // Secret the source needs (.dev.vars locally, Pages dashboard → Variables and Secrets in production); skipped without it
   requiresEnv?: string;
   // Requests with the same key share one cached result
   cacheKey: (query: SourceQuery) => string;
@@ -44,7 +45,7 @@ const SOURCES: Source[] = [
 type CacheEntry = { at: number; events: Promise<EventItem[]> };
 
 // Keeps the promise, so requests that arrive while a scrape is running wait for it instead of scraping again.
-// Lives as long as the Worker isolate, so warm requests in the same location reuse it.
+// Lives as long as the Cloudflare isolate running the function, so warm requests in the same location reuse it.
 const store = globalThis as typeof globalThis & { __eventsCache?: Map<string, CacheEntry> };
 const cache = (store.__eventsCache ??= new Map());
 
@@ -64,7 +65,7 @@ function scrapeCached({ source, scrape, cacheKey }: Source, query: SourceQuery) 
 export async function scrapeEvents(query: SourceQuery) {
   const nearNyc = distanceMiles(query, NYC) <= NYC_RANGE_MILES;
   const nearby = SOURCES.filter((source) => nearNyc || !source.nycOnly);
-  const missingKey = (source: Source) => !!source.requiresEnv && !process.env[source.requiresEnv];
+  const missingKey = (source: Source) => !!source.requiresEnv && !getEnv(source.requiresEnv);
   const sources = nearby.filter((source) => !missingKey(source));
   const results = await Promise.allSettled(sources.map((source) => scrapeCached(source, query)));
 

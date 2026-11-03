@@ -1,4 +1,5 @@
 {
+  // Pages Functions (functions/) and the server code they call (server/, lib/)
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -11,5 +12,5 @@
     "types": ["@cloudflare/workers-types"],
     "paths": { "@/*": ["../*"] }
   },
-  "include": ["./**/*.ts", "../lib/**/*.ts"]
+  "include": ["./**/*.ts", "../server/**/*.ts", "../lib/**/*.ts"]
 }

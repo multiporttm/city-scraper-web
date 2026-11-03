@@ -1,3 +1,4 @@
+import { getEnv } from '@/lib/env';
 import { fetchJson, stripHtml, zonedToIso } from '@/lib/scrapers/http';
 import type { RawEvent, Scraper } from '@/lib/scrapers/types';
 
@@ -71,8 +72,8 @@ function toRawEvent(event: TicketmasterEvent, startAt: string): RawEvent {
 }
 
 export const fetchTicketmaster: Scraper = async ({ latitude, longitude, radiusMiles, from, to }) => {
-  // Worker secret (wrangler secret put), never sent to the browser
-  const apiKey = process.env.TICKETMASTER_API_KEY;
+  // Server-side secret, never sent to the browser
+  const apiKey = getEnv('TICKETMASTER_API_KEY');
   if (!apiKey) throw new Error('TICKETMASTER_API_KEY is not set');
 
   const events: RawEvent[] = [];

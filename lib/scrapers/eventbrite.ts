@@ -1,3 +1,4 @@
+import { getEnv } from '@/lib/env';
 import { extractWindowJson, fetchJson, fetchText, mapLimited, stripHtml, zonedToIso } from '@/lib/scrapers/http';
 import type { RawEvent, Scraper } from '@/lib/scrapers/types';
 
@@ -80,7 +81,7 @@ type TicketAvailability = {
 // Eventbrite's official API dropped public event search in 2020, but it still returns details for a known event id.
 // With a private token (eventbrite.com/platform/api-keys) it fills in the ticket prices the search pages leave out.
 async function addPrices(events: RawEvent[]) {
-  const token = process.env.EVENTBRITE_TOKEN;
+  const token = getEnv('EVENTBRITE_TOKEN');
   if (!token) return events;
   const priced = events.slice(0, MAX_PRICED_EVENTS);
   const results = await mapLimited(priced, PRICE_CONCURRENCY, (event) =>

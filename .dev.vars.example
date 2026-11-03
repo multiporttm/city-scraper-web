@@ -1,5 +1,5 @@
-# Worker secrets for /api/events. Copy to .dev.vars for `npm run dev`,
-# and set each one in production with `npx wrangler secret put NAME`.
+# Secrets for the API (Pages Functions). Copy to .dev.vars for `npm run dev`. In production, add each one
+# in the Cloudflare dashboard: your Pages project → Settings → Variables and Secrets.
 # Each source is skipped until its key is set.
 
 # Free key: https://developer.ticketmaster.com (Discovery API)
