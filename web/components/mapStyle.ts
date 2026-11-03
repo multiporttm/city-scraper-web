@@ -48,8 +48,20 @@ const LAYER_COLORS: [prefix: string, color: string][] = [
   ['place', COLORS.label],
 ];
 
+// Map labels use LandUI Pro, served as glyph files from public/fonts (made by scripts/build-map-glyphs.mjs).
+// Place names (neighborhoods, cities) get the heavier weight, like Apple Maps.
+const LABEL_FONT = 'LandUIPro-Regular';
+const PLACE_FONT = 'LandUIPro-Semibold';
+const glyphsUrl = () => `${location.origin}/fonts/{fontstack}/{range}.pbf`;
+
 // Layers that only add clutter at city scale (and landcover_wood needs a texture the style doesn't ship)
 const HIDDEN_LAYERS = ['landcover_wood', 'road_oneway', 'road_oneway_opposite', 'aeroway-taxiway', 'aeroway-runway-casing', 'aeroway-area', 'aeroway-runway'];
+
+// Every label must use a font that exists in public/fonts, since the glyphs URL now points there
+function setFont(layer: LayerSpecification): LayerSpecification {
+  if (layer.type !== 'symbol' || !layer.layout?.['text-field']) return layer;
+  return { ...layer, layout: { ...layer.layout, 'text-font': [layer.id.startsWith('place') ? PLACE_FONT : LABEL_FONT] } };
+}
 
 function recolor(layer: LayerSpecification): LayerSpecification {
   const color = LAYER_COLORS.find(([prefix]) => layer.id.startsWith(prefix))?.[1];
@@ -73,8 +85,9 @@ function recolor(layer: LayerSpecification): LayerSpecification {
   }
 }
 
-// Applied to OpenFreeMap's dark style as it loads: hides the busy layers and repaints the rest
+// Applied to OpenFreeMap's dark style as it loads: hides the busy layers, repaints the rest and swaps in LandUI Pro
 export const appleLikeStyle = (style: StyleSpecification): StyleSpecification => ({
   ...style,
-  layers: style.layers.filter((layer) => !HIDDEN_LAYERS.includes(layer.id)).map(recolor),
+  glyphs: glyphsUrl(),
+  layers: style.layers.filter((layer) => !HIDDEN_LAYERS.includes(layer.id)).map((layer) => setFont(recolor(layer))),
 });
