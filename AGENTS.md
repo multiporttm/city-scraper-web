@@ -13,7 +13,7 @@ Users sign in, take a short quiz to understand their preferences, then browse th
 # Tech Stack
 Use the following stack:
 + Plain HTML, CSS and TypeScript in the browser (no UI framework), bundled with esbuild
-+ Leaflet for the map
++ Apple Maps (MapKit JS) for the map, with Leaflet + OpenStreetMap as the fallback when Apple keys aren't set
 + Cloudflare Workers (static assets + a Worker for `/api/*`), deployed with Wrangler
 + localStorage for saved state (through the small store in `web/store.ts`)
 + Server-side Worker routes for secrets, tokens, and AI calls

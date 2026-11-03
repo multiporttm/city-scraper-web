@@ -2,6 +2,8 @@ import { geocodeCity, type Coordinates } from '@/lib/cities';
 import { rankEvents } from '@/lib/ranking';
 import { scrapeEvents } from '@/lib/scrapers';
 
+import { mapkitConfigured, mapkitToken } from './mapkitToken';
+
 // How far ahead the feed looks
 const WINDOW_DAYS = 14;
 const DEFAULT_DISTANCE_MILES = 5;
@@ -51,6 +53,12 @@ export default {
     if (pathname === '/api/events') {
       if (request.method !== 'GET') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET' } });
       return getEvents(request);
+    }
+    // GET /api/mapkit-token: a signed token for Apple Maps (MapKit JS), or 503 when the Apple keys aren't set
+    if (pathname === '/api/mapkit-token') {
+      if (!mapkitConfigured()) return new Response('Apple Maps is not configured', { status: 503 });
+      const token = await mapkitToken(new URL(request.url).origin);
+      return new Response(token, { headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' } });
     }
     if (pathname.startsWith('/api/')) return Response.json({ error: 'Not found' }, { status: 404 });
     return env.ASSETS.fetch(request);

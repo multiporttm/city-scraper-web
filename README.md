@@ -54,5 +54,9 @@ Notes:
 
 - **Use the Workers Paid plan ($5/month) for reliable results.** A full scrape makes about 40 outbound requests and parses a few thousand events. The Free plan caps each request at 50 subrequests and 10 ms of CPU, so requests can be cut short. Turning on `EVENTBRITE_TOKEN` adds up to 60 more requests.
 - Results are cached in memory for 30 minutes per source, per Worker instance.
-- The map uses OpenStreetMap's public tiles, which are fine for light use. For real traffic, switch `TILES` in `web/components/eventMap.ts` to a hosted tile provider.
+- **Apple Maps** draws the Explore map once its keys are set (otherwise the map falls back to OpenStreetMap):
+  1. In your Apple Developer account ([Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources)), create a **Maps ID**, then a **key** with **MapKit JS** enabled for it, and download the `.p8` file.
+  2. Set the secrets: `npx wrangler secret put APPLE_MAPKIT_TEAM_ID` (your Team ID), `APPLE_MAPKIT_KEY_ID` (the key's ID), and `APPLE_MAPKIT_PRIVATE_KEY` (paste the whole `.p8` file). For local dev, put them in `.dev.vars`.
+  3. The Worker signs a 30-minute token for each visitor at `/api/mapkit-token`, locked to your site's origin; the private key never reaches the browser.
+- The fallback OpenStreetMap tiles are fine for light use. For real traffic without Apple Maps, switch `TILES` in `web/components/leafletMap.ts` to a hosted tile provider.
 - Sign-in is a local stand-in: the name, preferences and pinned events are kept in the browser's localStorage.

@@ -63,7 +63,13 @@ export function exploreScreen(): TabScreen {
     },
     onCenteredChange: (value) => (centered = value),
     onInteract: () => showHeader(),
+    // The floating tab bar covers the bottom of the map, plus a little breathing room
+    bottomInset: () => {
+      const tabBar = document.querySelector('.tab-bar');
+      return tabBar ? Math.max(0, window.innerHeight - tabBar.getBoundingClientRect().top + 8) : 0;
+    },
   });
+  window.addEventListener('resize', () => visible && map.resize());
 
   // Shows the header, then hides it after a while. Each call restarts the countdown.
   const showHeader = () => {
