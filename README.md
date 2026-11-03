@@ -1,4 +1,4 @@
-# City Scraper
+# City Scraper Web: The app by Emily Ahmad brought to the web
 
 Event exploration and management tool. Scrapes event-hosting websites like Luma, EventBrite, and Ticketmaster's public APIs to suggest events for users based on their inputted location, availability throughout the week, location, and range of commutable distance.
 
@@ -32,5 +32,13 @@ On signing in, users enter basic information and their preferences for events, t
 
 Download the Expo Go app and go to:
 
-exp://u.expo.dev/6088bc15-e538-42e2-8b29-00149cb2aa9a/group/cb6ed6bd-fad6-47a0-abee-40727087a94f
+exp://u.expo.dev/6088bc15-e538-42e2-8b29-00149cb2aa9a/group/cb6ed6bd-fad6-47a0-abee-40727087a94f (For official version)
+
+For Web Version:
+
+csw.ps.multiportllc.com
+
+Note: Unofficial Version. Official version at github.com/emilyahmad/city-scraper.
+
+
 
