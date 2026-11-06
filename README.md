@@ -8,7 +8,7 @@ Event exploration and management tool. Scrapes event-hosting websites like Luma,
 Recommended events are displayed with their location on a map, with an event card containing basic information. Tapping on the card centralizes the user's view of the event on the map, and tapping again opens an expanded modal with more event information and a link to the external listing. Swiping left archives the event, swiping right saves it.
 
 <div>
-<img src="screenshots/functionality/loading.png" width="140.333" height="286.33" alt="Part of failing the cooking sequence">
+<img src="screenshots/functionality/loading.jpeg" width="140.333" height="286.33" alt="Part of failing the cooking sequence">
 <img src="screenshots/functionality/card.png" width="140.333" height="286.33" alt="Part of failing the cooking sequence">
 <img src="screenshots/functionality/expanded.png" width="140.333" height="286.33" alt="Part of failing the cooking sequence">
 <img src="screenshots/functionality/pinned.png" width="140.333" height="286.33" alt="Part of failing the cooking sequence">
