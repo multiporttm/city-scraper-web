@@ -2,6 +2,7 @@
 
 Event exploration and management tool. Scrapes event-hosting websites like Luma, EventBrite, and Ticketmaster's public APIs to suggest events for users based on their inputted location, availability throughout the week, location, and range of commutable distance.
 
+**Try it:** https://csw.ps.multiportllc.com
 
 ## Screenshots
 
@@ -24,42 +25,13 @@ On signing in, users enter basic information and their preferences for events, t
 <img src="screenshots/settings/interests.png" width="140.333" height="286.33" alt="Part of failing the cooking sequence">
 
 </div>
-<br>
 
+Forked from emilyahmad/city-scraper
 
+Run Official Version at exp://u.expo.dev/6088bc15-e538-42e2-8b29-00149cb2aa9a/group/cb6ed6bd-fad6-47a0-abee-40727087a94f
 
-## Run it locally
+Official Version uses Apple Maps. This Version uses OpenStreetMap, OpenFreeMap, MabLibre, LandUI Pro Font, and Custom UI.
 
-Needs Node 20+.
+Login and Signup syncs between Official Version and this version.
 
-```sh
-npm install
-cp .dev.vars.example .dev.vars   # optional: API keys for Ticketmaster, SeatGeek, PredictHQ, Eventbrite prices, Apple Maps
-npm run dev                      # http://localhost:8788 (Cloudflare Pages, run locally)
-```
-
-The site is plain HTML, CSS and TypeScript (`public/`, `web/`), bundled with esbuild into `public/build/`. The API runs as Cloudflare Pages Functions in `functions/api/`: `GET /api/events` scrapes the sources in `lib/scrapers/` and ranks the results for the user's preferences. Run `npm run watch` in a second terminal to rebuild the browser app as you edit.
-
-## Deploy on Cloudflare Pages (dashboard)
-
-1. In the Cloudflare dashboard, go to **Workers & Pages → Create → Pages → Connect to Git** and pick this repository.
-2. Build settings:
-   - **Framework preset:** None
-   - **Build command:** `npm run build`
-   - **Build output directory:** `public`
-   - **Production branch:** the branch you deploy from (e.g. `main`)
-3. **Save and Deploy.** The site is live at `https://<project>.pages.dev`, and every push to the branch redeploys it.
-4. Optional keys: your project → **Settings → Variables and Secrets → Add**, using the names in `.dev.vars.example` (e.g. `TICKETMASTER_API_KEY`). Add them as **Secret** for Production (and Preview if you want). Then redeploy (**Deployments → … → Retry deployment**) so they take effect.
-
-`wrangler.jsonc` holds the Pages settings (output folder, compatibility date and the `nodejs_compat` flag), so those show as read-only in the dashboard. You can also deploy from your computer with `npx wrangler login` then `npm run deploy`.
-
-Notes:
-
-- **Use the Workers Paid plan ($5/month) for reliable results.** Pages Functions run on Workers and share its limits. A full scrape makes about 40 outbound requests and parses a few thousand events; the Free plan caps each request at 50 subrequests and 10 ms of CPU, so requests can be cut short. (Upgrade under **Workers & Pages → Plans**.) Turning on `EVENTBRITE_TOKEN` adds up to 60 more requests.
-- Results are cached in memory for 30 minutes per source, per running instance.
-- **Apple Maps** draws the Explore map once its keys are set (otherwise it uses the free OpenFreeMap map below):
-  1. In your Apple Developer account ([Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources)), create a **Maps ID**, then a **key** with **MapKit JS** enabled for it, and download the `.p8` file.
-  2. In the Pages project's **Variables and Secrets**, add `APPLE_MAPKIT_TEAM_ID` (your Team ID), `APPLE_MAPKIT_KEY_ID` (the key's ID), and `APPLE_MAPKIT_PRIVATE_KEY` (paste the whole `.p8` file) as secrets. For local dev, put them in `.dev.vars`.
-  3. The site's function signs a 30-minute token for each visitor at `/api/mapkit-token`, locked to your site's origin; the private key never reaches the browser.
-- Without Apple keys, the map uses free data from [OpenFreeMap](https://openfreemap.org) (OpenStreetMap, drawn with MapLibre), styled to look like Apple Maps' dark mode: no key, sign-up or view limit. The colors live in `web/components/mapStyle.ts`. Map labels use the LandUI Pro font, pre-cut into glyph files in `public/fonts/`; to change the font, follow the steps at the top of `scripts/build-map-glyphs.mjs`.
-- Sign-in is a local stand-in: the name, preferences and pinned events are kept in the browser's localStorage.
+Try more products by Emily Ahmad at emoolie.com. Try More Products by Multiporttm at multiportllc.com.
