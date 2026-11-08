@@ -108,5 +108,6 @@ export function rankEvents(events: EventItem[], prefs: RankingPreferences, now =
       return { event, score };
     })
     .sort((a, b) => b.score - a.score)
-    .map(({ event }) => event);
+    // The score goes along so the browser can adjust it for the user's own taste, age and gender (lib/personalize.ts)
+    .map(({ event, score }) => ({ ...event, score: Math.round(score * 10) / 10 }));
 }

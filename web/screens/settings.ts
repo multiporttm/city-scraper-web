@@ -1,4 +1,5 @@
 import { PREFERENCE_FORMS } from '@/data/preferences';
+import { aboutBlocker, aboutInputs, parseAge, type AboutValues } from '@/web/components/aboutInputs';
 import { blockerFor, PREFERENCE_INPUTS } from '@/web/components/preferenceInputs';
 import { openSheet, type Sheet } from '@/web/components/sheet';
 import { cx, h, tintedImage } from '@/web/dom';
@@ -57,17 +58,22 @@ function openPreferencesSheet(formId: PreferenceFormId) {
   sheet = openSheet({ className: 'edit-sheet', label: form.title, content });
 }
 
-function openNameSheet() {
+// Name, age and gender. Age and gender are optional and only fine-tune which events show up.
+function openProfileSheet() {
   let sheet: Sheet | null = null;
-  const input = h('input', { class: 'editable-field__input', id: 'name-input', value: profile.get().name, autocomplete: 'given-name', autocapitalize: 'words', spellcheck: 'false' });
+  const saved = profile.get();
+  let about: AboutValues = { age: saved.age?.toString() ?? '', gender: saved.gender };
+  const input = h('input', { class: 'editable-field__input', id: 'name-input', value: saved.name, autocomplete: 'given-name', autocapitalize: 'words', spellcheck: 'false' });
   const save = h('button', { class: 'primary-button sheet__save', type: 'submit' }, 'Save');
   const update = () => {
     const name = input.value.trim();
-    save.disabled = !name || name === profile.get().name;
-    save.textContent = name ? 'Save' : 'Enter a name';
+    const blocker = name ? aboutBlocker(about) : 'Enter a name';
+    const changed = name !== saved.name || parseAge(about.age) !== saved.age || about.gender !== saved.gender;
+    save.disabled = blocker !== null || !changed;
+    save.textContent = blocker ?? 'Save';
+    save.classList.toggle('sheet__save--hidden', blocker === null && !changed);
   };
   input.addEventListener('input', update);
-  update();
 
   const content = h(
     'form',
@@ -76,17 +82,25 @@ function openNameSheet() {
       onsubmit: (event: SubmitEvent) => {
         event.preventDefault();
         if (save.disabled) return;
-        profile.set({ name: input.value.trim() });
+        profile.set({ name: input.value.trim(), age: parseAge(about.age), gender: about.gender });
         sheet?.close();
       },
     },
     h('h2', { class: 'sheet__title' }, 'Edit Profile'),
-    h('p', { class: 'sheet__subtitle' }, 'The name shown on your profile'),
+    h('p', { class: 'sheet__subtitle' }, 'Your name, and optionally your age and gender'),
     h('div', { class: 'settings-section__card preferences-sheet__body' }, h('label', { class: 'editable-field', for: 'name-input' }, h('span', { class: 'editable-field__label' }, 'Name'), input)),
+    h(
+      'div',
+      { class: 'profile-sheet__about' },
+      aboutInputs(about, (values) => {
+        about = { ...about, ...values };
+        update();
+      }),
+    ),
     save,
   );
+  update();
   sheet = openSheet({ className: 'edit-sheet', label: 'Edit Profile', content });
-  requestAnimationFrame(() => input.focus());
 }
 
 export function settingsScreen(): TabScreen {
@@ -111,7 +125,7 @@ export function settingsScreen(): TabScreen {
         'section',
         { class: 'settings-section__card profile-card' },
         h('div', { class: 'profile-card__header' }, h('span', { class: 'profile-card__avatar' }, initial), name),
-        h('button', { class: 'settings-row settings-row--plain', type: 'button', onclick: openNameSheet }, h('span', { class: 'settings-row__label' }, 'Edit Profile'), chevron()),
+        h('button', { class: 'settings-row settings-row--plain', type: 'button', onclick: openProfileSheet }, h('span', { class: 'settings-row__label' }, 'Edit Profile'), chevron()),
       ),
       h(
         'section',

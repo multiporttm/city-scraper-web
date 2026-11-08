@@ -1,7 +1,8 @@
 import { QUIZ_STEPS } from '@/data/quiz';
+import { aboutBlocker, aboutInputs, parseAge, type AboutValues } from '@/web/components/aboutInputs';
 import { blockerFor, PREFERENCE_INPUTS } from '@/web/components/preferenceInputs';
 import { cx, h, replaceChildren } from '@/web/dom';
-import { completeOnboarding } from '@/web/state';
+import { completeOnboarding, profile } from '@/web/state';
 import type { PreferenceValues } from '@/types/preferences';
 
 // Starts blank so nothing is pre-selected, except a sensible distance and evening hours
@@ -13,10 +14,11 @@ const INITIAL_ANSWERS: PreferenceValues = {
   interests: '',
 };
 
-// The three-step onboarding quiz: location and distance, availability, interests.
+// The onboarding quiz: about you (optional age and gender), location and distance, availability, interests.
 export function quizScreen() {
   let stepIndex = 0;
   let answers = { ...INITIAL_ANSWERS };
+  let about: AboutValues = { age: profile.get().age?.toString() ?? '', gender: profile.get().gender };
   const screen = h('main', { class: 'quiz-screen' });
 
   const progress = h('div', { class: 'quiz-progress' });
@@ -29,7 +31,7 @@ export function quizScreen() {
 
   const updateButton = () => {
     const step = QUIZ_STEPS[stepIndex];
-    const blocker = blockerFor(step.id, answers);
+    const blocker = step.id === 'about' ? aboutBlocker(about) : blockerFor(step.id, answers);
     button.disabled = blocker !== null;
     button.textContent = blocker ?? (stepIndex === QUIZ_STEPS.length - 1 ? 'Finish' : 'Continue');
   };
@@ -47,10 +49,15 @@ export function quizScreen() {
     // Each step starts fresh, built from the answers so far
     replaceChildren(
       body,
-      PREFERENCE_INPUTS[step.id](answers, (values) => {
-        answers = { ...answers, ...values };
-        updateButton();
-      }),
+      step.id === 'about'
+        ? aboutInputs(about, (values) => {
+            about = { ...about, ...values };
+            updateButton();
+          })
+        : PREFERENCE_INPUTS[step.id](answers, (values) => {
+            answers = { ...answers, ...values };
+            updateButton();
+          }),
     );
     updateButton();
     screen.scrollTo({ top: 0 });
@@ -67,6 +74,7 @@ export function quizScreen() {
       stepIndex += 1;
       showStep();
     } else {
+      profile.set({ age: parseAge(about.age), gender: about.gender });
       completeOnboarding(answers);
     }
   });

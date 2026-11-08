@@ -74,4 +74,6 @@ export type EventItem = {
   source: EventSource;
   // Distance from the user's location, set when the feed is ranked
   distanceMiles?: number;
+  // How well the event fits the user's preferences, set by the server's ranking (higher is better)
+  score?: number;
 };

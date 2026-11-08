@@ -1345,6 +1345,43 @@ a {
   }
 }
 
+/* About you: age and gender */
+.about-inputs__label {
+  margin: 24px 0 12px;
+  padding: 0 4px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.about-inputs__genders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.about-inputs__hint {
+  margin-top: 16px;
+  padding: 0 4px;
+  font-size: 14px;
+  color: var(--text-faint);
+}
+
+.profile-sheet__about {
+  margin-top: 12px;
+}
+
+/* No spinner arrows on the age field */
+.about-inputs input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.about-inputs input[type='number']::-webkit-inner-spin-button,
+.about-inputs input[type='number']::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
 /* Sign in */
 .auth-screen {
   width: 100%;
